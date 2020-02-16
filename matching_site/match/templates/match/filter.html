@@ -1,0 +1,51 @@
+<div id="filter">
+    {% if gender %}
+            <div class="container">
+                <strong style="color:#87CEFA">Showing results for {{ gender }}</strong>
+                <hr>
+            </div>
+    {% endif %}
+    {% if age1 and age2 %}
+        <div class="container">
+                <strong style="color:#87CEFA">Showing ages {{ age1 }} years or older, and younger than {{ age2 }} years</strong>
+                <hr>
+            </div>
+    {% endif %}
+    {% if age_range_error %}
+            <div class="container">
+                <strong style="color:#87CEFA">{{ age_range_error }}</strong>
+                <hr>
+            </div>
+    {% endif %}
+    {% for user in users %}
+        <div class="row">
+        <div class="col-sm-3">
+            <img src="{{ user.image.url }}" class="rounded-circle" alt="profile" height="100" width="100">
+            <p></p>
+            <strong>&nbsp;&nbsp;&nbsp;{{ user.username }} <span class="badge badge-pill badge-light">{{ user.gender }}</span></strong>
+            <p style="margin:5px"></p>
+            <strong style="font-size:13px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ user.age }} years </strong>
+        </div>
+            <div class="col-sm-9">
+                <strong>Hobbies</strong>
+                    <h5>
+                    {% for hobby in user.hobbies.all %}
+                         {% if hobby in logged_in_user.hobbies.all %}
+                            <span class="badge badge-dark"style="background-color:#87CEFA">{{ hobby }}</span>
+                         {% else %}
+                            <span class="badge badge-light">{{ hobby }}</span>
+                         {% endif %}
+                    {% endfor %}
+                    </h5>
+                    <hr>
+                    {% if user.common_hobbies_count == 1%}
+                        <p>You have <strong>{{ user.common_hobbies_count }}</strong> hobby in common</p>
+                    {% else %}
+                        <p>You have <strong>{{ user.common_hobbies_count }}</strong> hobbies in common</p>
+                    {% endif %}
+                    <hr>
+            </div>
+        </div>
+            <br>
+    {% endfor %}
+    </div>

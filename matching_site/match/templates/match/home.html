@@ -1,0 +1,114 @@
+{% extends 'match/base.html' %}
+{% block content %}
+{% load static %}
+
+    <form method="POST" id="gender-filter">
+        {% csrf_token %}
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="Male">
+          <label class="form-check-label" for="inlineCheckbox1"><strong>Male</strong></label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="Female">
+          <label class="form-check-label" for="inlineCheckbox2"><strong>Female</strong></label>
+        </div>
+        <button type="submit" style="background-color:#87CEFA">Filter Gender</button>
+    </form>
+    <br>
+    <form method="POST" id="age-filter">
+      {% csrf_token %}
+      <div class="form-row" >
+          <strong>Age between</strong>
+        <div class="col">
+          <input type="number" class="form-control" id="number1">
+        </div>
+          <strong>and</strong>
+        <div class="col">
+          <input type="number" class="form-control" id="number2">
+        </div>
+        <div class="col">
+          <button type="submit" style="background-color:#87CEFA">Filter Age</button>
+        </div>
+      </div>
+    </form>
+
+    <h1>FEED</h1>
+    <hr>
+    <img src="{{ logged_in_user.image.url }}" class="rounded-circle" alt="profile" height="100" width="100">
+    <strong><a href="/profile">{{ logged_in_user.username }}</a></strong>
+    <br>
+    <strong style="font-size:12px">My Hobbies</strong>
+    <br>
+    {% for hobby in logged_in_user.hobbies.all %}
+        <span class="badge badge-dark"style="background-color:#87CEFA">{{ hobby }}</span>
+    {% endfor %}
+    <hr>
+    <h3>Users with Common Hobbies</h3>
+    <hr>
+    <div id="filter">
+    {% for user in users %}
+        <div class="row">
+        <div class="col-sm-3">
+            <img src="{{ user.image.url }}" class="rounded-circle" alt="profile" height="100" width="100">
+            <p></p>
+            <strong>&nbsp;&nbsp;&nbsp;{{ user.username }} <span class="badge badge-pill badge-light">{{ user.gender }}</span></strong>
+            <p style="margin:5px"></p>
+            <strong style="font-size:13px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ user.age }} years </strong>
+        </div>
+            <div class="col-sm-9">
+                <p style="font-size:15px"><strong>Date of Birth</strong>: {{ user.date_of_birth }}</p><hr>
+                <strong>Hobbies</strong>
+                    <h5>
+                    {% for hobby in user.hobbies.all %}
+                         {% if hobby in logged_in_user.hobbies.all %}
+                            <span class="badge badge-dark"style="background-color:#87CEFA">{{ hobby }}</span>
+                         {% else %}
+                            <span class="badge badge-light">{{ hobby }}</span>
+                         {% endif %}
+                    {% endfor %}
+                    </h5>
+                    <hr>
+                    {% if user.common_hobbies_count == 1%}
+                        <p>You have <strong>{{ user.common_hobbies_count }}</strong> hobby in common</p>
+                    {% else %}
+                        <p>You have <strong>{{ user.common_hobbies_count }}</strong> hobbies in common</p>
+                    {% endif %}
+                    <hr>
+            </div>
+        </div>
+            <hr>
+        {% endfor %}
+    </div>
+    <script src="{% static 'match/jquery.js' %}">
+    </script>
+    <script>
+        $(document).on('submit','#gender-filter',function(event){
+        event.preventDefault();
+        $.ajax({
+            url : "",
+            type : "GET",
+            data : {
+                male:$('#inlineCheckbox1:checked').val(),
+                female:$('#inlineCheckbox2:checked').val(),
+            },
+            }).done(function (data)
+                {
+                 $('#filter').replaceWith(data);
+            });
+        });
+        $(document).on('submit','#age-filter',function(event){
+        event.preventDefault();
+        $.ajax({
+            url : "",
+            type : "GET",
+            data : {
+                age1:$('#number1').val(),
+                age2:$('#number2').val(),
+            },
+            }).done(function (data)
+                {
+                $('#filter').replaceWith(data);
+            });
+        });
+    </script>
+{% endblock content %}
